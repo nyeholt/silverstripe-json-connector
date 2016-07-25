@@ -19,21 +19,26 @@ class JsonContentItem extends ExternalContentItem
         }
         $this->propertyPaths = $propertyPaths;
         
-        if (is_object($item)) {
+        if (is_object($item) || is_array($item)) {
             $this->item = $item;
             // $propertyPaths may have an ID path
             foreach ($propertyPaths as $name => $jsonPath) {
                 $pathBits = explode('|', $jsonPath);
-                $valBits = array();
-                if (count($pathBits) == 2) {
-                    $o = 1;
+                if ($jsonPath == '$.*.8') {
+                    $o = 0;
                 }
+                $valBits = array();
+                $separator = '';
                 foreach ($pathBits as $jpath) {
+                    if ($jpath{0} != '$') {
+                        // we have a separator
+                        $separator = $jpath;
+                        continue;
+                    }
                     $path = (new Flow\JSONPath\JSONPath($this->item))->find($jpath);
-                    
                     $valBits[] = $path[0];
                 }
-                $this->$name = implode('', $valBits);
+                $this->$name = implode($separator, $valBits);
             }
             $item = isset($propertyPaths['ID']) ? $this->ID : (isset($item->id) ? $item->ID : null);
         }
