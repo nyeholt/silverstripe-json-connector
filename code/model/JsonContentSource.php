@@ -12,6 +12,7 @@ class JsonContentSource extends ExternalContentSource
 
     public static $db = array(
         'Url'           => 'Varchar(255)',
+        'Method'        => 'Varchar',
         'CacheLifetime' => 'Int',
         'CollectionPath'    => 'Varchar(255)',
         'ItemValuePaths'        => 'MultiValueField',
@@ -40,6 +41,7 @@ class JsonContentSource extends ExternalContentSource
         $fields->addFieldToTab(
             'Root.Main',
             new TextField('Url', 'JSON Feed URL'), 'ShowContentInMenu');
+        $fields->addFieldToTab('Root.Main', DropdownField::create('Method', 'Request type', array('GET' => 'GET', 'POST' => 'POST')));
 
         $fields->addFieldToTab(
             'Root.Advanced',
@@ -147,7 +149,8 @@ class JsonContentSource extends ExternalContentSource
     protected function getRawData() {
         if ($this->Url) {
             $client = RestfulService::create($this->Url, $this->CacheLifetime);
-            $res = $client->request();
+            $method = $this->Method ? $this->Method : 'GET';
+            $res = $client->request('', $method);
             if ($res->getStatusCode() == 200) {
                 return $res->getBody();
             }
