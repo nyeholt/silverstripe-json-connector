@@ -1,0 +1,17 @@
+{
+	"name": "silverstripe-australia/json-connector",
+	"description": "A JSON connector for the external content module.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "external-content", "integration", "json"],
+	"authors": [{
+		"name": "Marcus Nyeholt",
+		"email": "marcus@silverstripe.com.au"
+	}
+	],
+	"require": {
+		"silverstripe/framework": ">=3.1.0",
+		"silverstripe/multivaluefield": "~2.0",
+		"guzzlehttp/guzzle": "~6.2.0",
+		"flow/jsonpath": "~0.3.1"
+	}
+}
