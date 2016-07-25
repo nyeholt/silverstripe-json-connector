@@ -60,7 +60,7 @@ class JsonContentSource extends ExternalContentSource
         $data = $this->jsonData();
         if ($data) {
             $fields->addFieldsToTab('Root.Main', array(
-                new TextareaField('SampleContent', 'Feed content', json_encode($data, JSON_PRETTY_PRINT)),
+                new TextareaField('SampleContent', 'Matched collection', json_encode($data, JSON_PRETTY_PRINT)),
             ));
         }
         
@@ -136,12 +136,22 @@ class JsonContentSource extends ExternalContentSource
     public function jsonData()
     {
         if (!$this->json && strlen($this->Url) && $this->CollectionPath) {
-            $raw = file_get_contents($this->Url);
+            $raw = $this->getRawData();
             $this->json = @json_decode($raw);
             $this->json = (new JSONPath($this->json))->find($this->CollectionPath)->data();
         }
 
         return $this->json;
+    }
+    
+    protected function getRawData() {
+        if ($this->Url) {
+            $client = RestfulService::create($this->Url, $this->CacheLifetime);
+            $res = $client->request();
+            if ($res->getStatusCode() == 200) {
+                return $res->getBody();
+            }
+        }
     }
 
     public function getContentImporter($target = null)
