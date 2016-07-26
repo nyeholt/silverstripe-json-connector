@@ -31,4 +31,13 @@ class ImportedJsonObject extends DataObject
         $props = $this->RawData->getValues();
         return ($props && isset($props[$fieldName])) ? $props[$fieldName] : null;
     }
+    
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        
+        $fields->replaceField('RawData', KeyValueField::create('RawData', 'Raw properties'));
+        $fields->makeFieldReadonly('ExternalId');
+        return $fields;
+    }
 }

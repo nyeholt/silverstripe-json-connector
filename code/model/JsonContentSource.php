@@ -10,7 +10,7 @@ class JsonContentSource extends ExternalContentSource
 
     const DEFAULT_CACHE_LIFETIME = 1800;
 
-    public static $db = array(
+    private static $db = array(
         'Url'           => 'Varchar(255)',
         'Method'        => 'Varchar',
         'CacheLifetime' => 'Int',
@@ -21,11 +21,16 @@ class JsonContentSource extends ExternalContentSource
         'ImportProperties'      => 'MultiValueField',
     );
 
-    public static $defaults = array(
+    private static $defaults = array(
         'CacheLifetime' => self::DEFAULT_CACHE_LIFETIME
     );
-
-    public static $icon = 'rssconnector/images/rssconnector';
+    
+    private static $selectable_types = array(
+        'ImportedJsonObject' => 'JSON Object', 
+        'Page' => 'Standard page',
+    );
+    
+    private static $icon = 'rssconnector/images/rssconnector';
 
     protected $client;
 
@@ -67,8 +72,8 @@ class JsonContentSource extends ExternalContentSource
         }
         
         $fields->addFieldsToTab('Root.Import', array(
-            TextField::create('ImportType', 'Import Data type'),
-            KeyValueField::create('ImportProperties', 'Static properties')->setRightTitle('Set for all imported items'),
+            DropdownField::create('ImportType', 'Import as object type', $this->config()->selectable_types),
+            KeyValueField::create('ImportProperties', 'Static properties')->setRightTitle('Set these fields for all imported items'),
         ));
 
 
@@ -159,7 +164,7 @@ class JsonContentSource extends ExternalContentSource
 
     public function getContentImporter($target = null)
     {
-        return null;
+        return Injector::inst()->get('JsonDataImporter');
     }
 
     public function allowedImportTargets()

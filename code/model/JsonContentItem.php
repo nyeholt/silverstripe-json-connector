@@ -9,7 +9,7 @@ class JsonContentItem extends ExternalContentItem
     protected $propertyPaths;
 
     /**
-     * @param RssContentSource $source
+     * @param JsonContentSource $source
      * @param SimplePie_Item $item
      */
     public function __construct($source = null, $item = null, $propertyPaths = null)
