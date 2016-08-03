@@ -67,7 +67,7 @@ class JsonContentSource extends ExternalContentSource
         $data = $this->jsonData();
         if ($data) {
             $fields->addFieldsToTab('Root.Main', array(
-                new TextareaField('SampleContent', 'Matched collection', json_encode($data, JSON_PRETTY_PRINT)),
+                new TextareaField('SampleContent', 'Matched collection (truncated...)', substr(json_encode($data, JSON_PRETTY_PRINT), 0, 2000)),
             ));
         }
         
