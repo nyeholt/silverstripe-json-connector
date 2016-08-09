@@ -3,7 +3,7 @@
 /**
  * @author marcus
  */
-class ImportedJsonObject extends DataObject
+class DataImport extends DataObject
 {
 
     private static $db = array(
