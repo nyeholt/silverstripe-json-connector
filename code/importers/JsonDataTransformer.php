@@ -18,7 +18,7 @@ class JsonDataTransformer implements ExternalContentTransformer
         
         $allowedTypes = Config::inst()->get('JsonContentSource', 'selectable_types');
         $selectedType = $source->ImportType;
-        $selectedType = isset($allowedTypes[$selectedType]) ? $selectedType : 'ImportedJsonObject';
+        $selectedType = isset($allowedTypes[$selectedType]) ? $selectedType : 'DataImport';
         
         $existing = null;
         $newObject = new $selectedType;
@@ -27,7 +27,7 @@ class JsonDataTransformer implements ExternalContentTransformer
         if ($newObject instanceof Page) {
             $existing = $selectedType::get()->filter(array('Title' => $item->Title, 'ParentID' => $parentObject->ID))->first();
             
-        } else if ($newObject instanceof ImportedJsonObject) {
+        } else if ($newObject instanceof DataImport) {
             $existing = $selectedType::get()->filter('ExternalId', $item->getExternalId())->first();
         } else {
             
@@ -58,7 +58,7 @@ class JsonDataTransformer implements ExternalContentTransformer
             $newObject->$field = $val;
         }
         // set the raw data
-        if ($newObject instanceof ImportedJsonObject) {
+        if ($newObject instanceof DataImport) {
             $newObject->ExternalId = $item->getExternalId();
             $newObject->RawData = $remoteProps;
             $newObject->SourceID = $source->ID;

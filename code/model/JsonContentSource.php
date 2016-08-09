@@ -26,8 +26,8 @@ class JsonContentSource extends ExternalContentSource
     );
     
     private static $selectable_types = array(
-        'ImportedJsonObject' => 'JSON Object', 
-        'Page' => 'Standard page',
+        'DataImport' => 'Data Import Object',
+        'Page' => 'Standard Page',
     );
     
     private static $icon = 'rssconnector/images/rssconnector';
