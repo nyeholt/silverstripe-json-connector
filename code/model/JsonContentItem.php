@@ -1,6 +1,6 @@
 <?php
 /**
- * An JSON entry from an external JOSN feed.
+ * An JSON entry from an external JSON feed.
  */
 class JsonContentItem extends ExternalContentItem
 {
