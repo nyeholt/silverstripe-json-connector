@@ -7,10 +7,15 @@ class DataImport extends DataObject
 {
 
     private static $db = array(
-        'Title' => 'Varchar(255)',
         'ExternalId' => 'Varchar(128)',
+        'Title' => 'Varchar(255)',
         'RawData' => 'MultiValueField',
         'DataType' => 'Varchar(64)',
+    );
+    private static $summary_fields = array(
+        'ExternalIdSummary' => 'External ID',
+        'Title' => 'Title',
+        'DataType' => 'Data Type'
     );
     private static $indexes = array(
         'DataType',
@@ -30,6 +35,11 @@ class DataImport extends DataObject
     {
         $props = $this->RawData->getValues();
         return ($props && isset($props[$fieldName])) ? $props[$fieldName] : null;
+    }
+
+    public function getExternalIdSummary()
+    {
+        return $this->ExternalId ? $this->ExternalId : '-';
     }
     
     public function getCMSFields()
