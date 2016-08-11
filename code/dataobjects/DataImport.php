@@ -17,6 +17,16 @@ class DataImport extends DataObject
         'Title' => 'Title',
         'DataType' => 'Data Type'
     );
+    private static $searchable_fields = array(
+        'ExternalId' => array(
+            'title' => 'External ID'
+        ),
+        'Title' => 'Title',
+        'DataType' => array(
+            'title' => 'Data Type',
+            'field' => 'DropdownField'
+        )
+    );
     private static $indexes = array(
         'DataType',
     );
@@ -41,7 +51,27 @@ class DataImport extends DataObject
     {
         return $this->ExternalId ? $this->ExternalId : '-';
     }
-    
+
+    public function scaffoldSearchFields($_params = null)
+    {
+        $fields = parent::scaffoldSearchFields($_params);
+
+        // Populate the data type field with the possible options.
+
+        $types = array(
+            '' => ''
+        );
+        foreach(DataImport::get()->sort('DataType', 'ASC')->column('DataType') as $type) {
+            $types[$type] = $type;
+        }
+        $fields->replaceField('DataType', DropdownField::create(
+            'DataType',
+            'Data Type',
+            $types
+        ));
+        return $fields;
+    }
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
