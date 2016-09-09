@@ -14,6 +14,9 @@ class JsonDataTransformer implements ExternalContentTransformer
 
     public function transform($item, $parentObject, $duplicateStrategy)
     {
+        $current = Versioned::current_stage();
+        Versioned::reading_stage('Stage');
+        
         $source = $item->getSource();
         
         $allowedTypes = Config::inst()->get('JsonContentSource', 'selectable_types');
@@ -24,7 +27,7 @@ class JsonDataTransformer implements ExternalContentTransformer
         $newObject = new $selectedType;
         
         
-        if ($newObject instanceof Page) {
+        if ($newObject instanceof SiteTree) {
             $existing = $selectedType::get()->filter(array('Title' => $item->Title, 'ParentID' => $parentObject->ID))->first();
             
         } else if ($newObject instanceof DataImport) {
@@ -44,6 +47,9 @@ class JsonDataTransformer implements ExternalContentTransformer
                 }
             }
         }
+        
+        // set now, so that later functionality can overwrite. 
+        $newObject->ParentID = $parentObject->ID;
         
         $fixedProperties = $source->ImportProperties->getValues();
         if ($fixedProperties && count($fixedProperties)) {
@@ -65,6 +71,8 @@ class JsonDataTransformer implements ExternalContentTransformer
         }
         
         $newObject->write();
+        
+        Versioned::reading_stage($current);
         return $newObject;
     }
 }
