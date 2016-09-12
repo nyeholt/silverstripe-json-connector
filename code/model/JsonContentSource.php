@@ -150,7 +150,7 @@ class JsonContentSource extends ExternalContentSource
 
         return $this->json;
     }
-    
+
     protected function getRawData() {
         if ($this->Url) {
             $client = RestfulService::create($this->Url, $this->CacheLifetime);

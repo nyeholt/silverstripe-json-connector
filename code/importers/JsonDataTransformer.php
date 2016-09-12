@@ -50,11 +50,15 @@ class JsonDataTransformer implements ExternalContentTransformer
         
         // set now, so that later functionality can overwrite. 
         $newObject->ParentID = $parentObject->ID;
+        $doPublish = false;
         
         $fixedProperties = $source->ImportProperties->getValues();
         if ($fixedProperties && count($fixedProperties)) {
             foreach ($fixedProperties as $prop => $val) {
                 $newObject->$prop = $val;
+                if ($prop == 'DoPublish' && $val) {
+                    $doPublish = true;
+                }
             }
         }
         
@@ -71,6 +75,10 @@ class JsonDataTransformer implements ExternalContentTransformer
         }
         
         $newObject->write();
+        
+        if ($doPublish) {
+            $newObject->publish('Stage', 'Live');
+        }
         
         Versioned::reading_stage($current);
         return $newObject;
