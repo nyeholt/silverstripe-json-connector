@@ -21,6 +21,11 @@ class JsonContentSource extends ExternalContentSource
         'ImportProperties'      => 'MultiValueField',
     );
 
+    
+    private static $has_one = array(
+        'DataFile'      => 'File',
+    );
+    
     private static $defaults = array(
         'CacheLifetime' => self::DEFAULT_CACHE_LIFETIME
     );
@@ -40,13 +45,36 @@ class JsonContentSource extends ExternalContentSource
         foreach (self::$db as $name => $du) {
             $fields->removeByName($name);
         }
+        $fields->removeByName('DataFile');
         
         Requirements::css('rssconnector/css/RssContentAdmin.css');
 
-        $fields->addFieldToTab(
-            'Root.Main',
-            new TextField('Url', 'JSON Feed URL'), 'ShowContentInMenu');
-        $fields->addFieldToTab('Root.Main', DropdownField::create('Method', 'Request type', array('GET' => 'GET', 'POST' => 'POST')));
+        $dataSourceField = new SelectionGroup(
+            "DataSourceField",
+            array(
+                new SelectionGroup_Item(
+                    "url",
+                    array(
+                        new TextField('Url', 'JSON Feed URL'),
+                        DropdownField::create('Method', 'Request type', array('GET' => 'GET', 'POST' => 'POST'))
+                    ),
+                    'From URL'
+                ),
+                new SelectionGroup_Item(
+                    'file',
+                    UploadField::create('DataFile', 'Data file'),
+                    'From File'
+                )
+            )
+        );
+        
+        if ($this->DataFileID) {
+            $dataSourceField->setValue('file');
+        } else {
+            $dataSourceField->setValue('url');
+        }
+        
+        $fields->addFieldToTab('Root.Main', $dataSourceField, 'ShowContentInMenu');
 
         $fields->addFieldToTab(
             'Root.Advanced',
@@ -75,21 +103,6 @@ class JsonContentSource extends ExternalContentSource
             DropdownField::create('ImportType', 'Import as object type', $this->config()->selectable_types),
             KeyValueField::create('ImportProperties', 'Static properties')->setRightTitle('Set these fields for all imported items'),
         ));
-
-
-//        $fields->addFieldsToTab('Root.Import', array(
-//            new HeaderField('PostImportHeader', 'Post Import Settings'),
-//            new CheckboxField('PublishPosts', 'Publish imported posts?', true),
-//            new CheckboxField('ProvideComments', 'Allow comments on imported posts?', true),
-//            new HeaderField('TagsImportHeader', 'Tags Import Settings'),
-//            new CheckboxField('ImportCategories', 'Import categories as tags?', true),
-//            new DropdownField('UnknownCategories', 'Unknown categories', array(
-//                'create' => 'Have a tag created for them',
-//                'skip'   => 'Are ignored'
-//            )),
-//            new TextField('ExtraTags', 'Tags to include on imported posts (comma separated)'),
-//            new HeaderField('GeneralImportHeader', 'General Import Settings')
-//        ));
 
         return $fields;
     }
@@ -142,7 +155,7 @@ class JsonContentSource extends ExternalContentSource
      */
     public function jsonData()
     {
-        if (!$this->json && strlen($this->Url) && $this->CollectionPath) {
+        if (!$this->json && (strlen($this->Url) || $this->DataFileID) && $this->CollectionPath) {
             $raw = $this->getRawData();
             $this->json = @json_decode($raw);
             $this->json = (new JSONPath($this->json))->find($this->CollectionPath)->data();
@@ -152,7 +165,9 @@ class JsonContentSource extends ExternalContentSource
     }
 
     protected function getRawData() {
-        if ($this->Url) {
+        if ($this->DataFileID) {
+            return file_get_contents($this->DataFile()->getFullPath());
+        } else if ($this->Url) {
             $client = RestfulService::create($this->Url, $this->CacheLifetime);
             $method = $this->Method ? $this->Method : 'GET';
             $res = $client->request('', $method);
