@@ -76,6 +76,8 @@ class JsonDataTransformer implements ExternalContentTransformer
         
         $newObject->write();
         
+        $newObject->extend('onJsonDataImport', $item);
+        
         if ($doPublish) {
             $newObject->publish('Stage', 'Live');
         }
