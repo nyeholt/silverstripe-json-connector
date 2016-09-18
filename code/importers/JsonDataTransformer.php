@@ -80,6 +80,7 @@ class JsonDataTransformer implements ExternalContentTransformer
         
         if ($doPublish) {
             $newObject->publish('Stage', 'Live');
+            $newObject->extend('onAfterPublish');
         }
         
         Versioned::reading_stage($current);
