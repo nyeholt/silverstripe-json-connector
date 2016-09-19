@@ -49,7 +49,9 @@ class JsonDataTransformer implements ExternalContentTransformer
         }
         
         // set now, so that later functionality can overwrite. 
-        $newObject->ParentID = $parentObject->ID;
+        if(!($newObject instanceof DataImport)) {
+            $newObject->ParentID = $parentObject->ID;
+        }
         $doPublish = false;
         
         $fixedProperties = $source->ImportProperties->getValues();
