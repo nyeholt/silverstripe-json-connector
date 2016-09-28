@@ -37,7 +37,13 @@ class JsonContentItem extends ExternalContentItem
                     $path = (new Flow\JSONPath\JSONPath($this->item))->find($jpath);
                     $valBits[] = $path[0];
                 }
-                $this->$name = implode('', $valBits);
+                
+                if (count($valBits) === 1 && $valBits[0] instanceof \Flow\JSONPath\JSONPath) {
+                    $val = $valBits[0]->data();
+                } else {
+                    $val = implode('', $valBits);
+                }
+                $this->$name = $val; 
             }
             $item = isset($propertyPaths['ID']) ? $this->ID : (isset($item->id) ? $item->ID : null);
         }
