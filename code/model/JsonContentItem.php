@@ -28,17 +28,16 @@ class JsonContentItem extends ExternalContentItem
                     $o = 0;
                 }
                 $valBits = array();
-                $separator = '';
                 foreach ($pathBits as $jpath) {
                     if ($jpath{0} != '$') {
                         // we have a separator
-                        $separator = $jpath;
+                        $valBits[] = $jpath;
                         continue;
                     }
                     $path = (new Flow\JSONPath\JSONPath($this->item))->find($jpath);
                     $valBits[] = $path[0];
                 }
-                $this->$name = implode($separator, $valBits);
+                $this->$name = implode('', $valBits);
             }
             $item = isset($propertyPaths['ID']) ? $this->ID : (isset($item->id) ? $item->ID : null);
         }
