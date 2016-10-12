@@ -29,11 +29,10 @@ class JsonDataTransformer implements ExternalContentTransformer
         
         if ($newObject instanceof SiteTree) {
             $existing = $selectedType::get()->filter(array('Title' => $item->Title, 'ParentID' => $parentObject->ID))->first();
-            
         } else if ($newObject instanceof DataImport) {
             $existing = $selectedType::get()->filter('ExternalId', $item->getExternalId())->first();
         } else {
-            
+            $existing = $selectedType::get()->filter(array('Title' => $item->Title))->first();
         }
         
         if ($existing) {
