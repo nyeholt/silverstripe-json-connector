@@ -166,7 +166,20 @@ class JsonContentSource extends ExternalContentSource
 
     protected function getRawData() {
         if ($this->DataFileID) {
-            return file_get_contents($this->DataFile()->getFullPath());
+            $file = $this->DataFile();
+            if ($file->hasMethod('ensureLocalFile') && $file->CDNFile && $file->reader() && $file->reader()->exists()) {
+                $file->ensureLocalFile();
+                if ($file->localFileExists()) {
+                    $data = file_get_contents($this->DataFile()->getFullPath());
+                    return $data;
+                }
+            } else {
+                $data = '';
+                if (file_exists($this->DataFile()->getFullPath())) {
+                    $data = file_get_contents($this->DataFile()->getFullPath());
+                }
+                return $data;
+            }
         } else if ($this->Url) {
             $client = RestfulService::create($this->Url, $this->CacheLifetime);
             $method = $this->Method ? $this->Method : 'GET';
